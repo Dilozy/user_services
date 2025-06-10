@@ -1,0 +1,22 @@
+[project]
+name = "userservices"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "dilozy",email = "denfil228@yandex.ru"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "django (>=5.2.2,<6.0.0)",
+    "djangorestframework (>=3.16.0,<4.0.0)",
+    "psycopg[binary] (>=3.2.9,<4.0.0)",
+    "django-extensions (>=4.1,<5.0)",
+    "celery[rabbitmq] (>=5.5.3,<6.0.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

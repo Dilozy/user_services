@@ -25,9 +25,9 @@ class Tariff(models.Model):
 
 
 class UserSubscription(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE,
-                             related_name="subscriptions")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE,
+                                related_name="subscription")
     tariff = models.ForeignKey(Tariff,
                                on_delete=models.CASCADE,
                                related_name="subscriptions")

@@ -13,5 +13,5 @@ class UserSubscriptionViewSet(viewsets.ModelViewSet):
     serializer_class = UserSubscriptionSerializer
 
     def get_queryset(self):
-        return UserSubscription.objects.prefetch_related("tariff") \
+        return UserSubscription.objects.select_related("tariff") \
                                .filter(user=self.request.user).defer("user")

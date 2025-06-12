@@ -2,9 +2,9 @@ services:
   web-app:
     build: .
     container_name: "web_app"
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python /application/user_services/manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./user_services:/application
+      - ./user_services:/application/user_services
     ports:
       - "8000:8000"
     depends_on:
@@ -31,9 +31,9 @@ services:
     build: .
     container_name: "celery_worker"
     entrypoint: celery
-    command: -A core.celery_app.app worker --loglevel=INFO
+    command: -A core worker --loglevel=INFO
     volumes:
-      - ./user_services:/application
+      - ./user_services:/application/user_services
     depends_on:
       - database
       - rabbitmq
@@ -41,6 +41,8 @@ services:
       - .env
     links:
       - rabbitmq
+    environment:
+      - PYTHONPATH=/application/user_services
 
   rabbitmq:
     container_name: rabbitmq

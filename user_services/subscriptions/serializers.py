@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Tariff, UserSubscription
+from users.serializers import UserSerializer
 
 
 class ListDetailTariffsSerializer(serializers.ModelSerializer):
@@ -12,10 +13,11 @@ class ListDetailTariffsSerializer(serializers.ModelSerializer):
 class UserSubscriptionSerializer(serializers.ModelSerializer):
     tariff = serializers.CharField(write_only=True, label="Тариф", required=False)
     tariff_details = ListDetailTariffsSerializer(read_only=True, source="tariff")
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = UserSubscription
-        exclude = ["user"]
+        fields = "__all__"
         read_only_fields = ["end_date", "start_date"]
     
     def validate(self, data):
@@ -31,8 +33,8 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
-        user = self.context["request"].user
         tariff = validated_data["tariff"]
+        user = self.context["request"].user
         
         new_subscription = UserSubscription(**validated_data,
                                             user=user)

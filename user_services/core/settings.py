@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'subscriptions',
+    'products',
 ]
 
 MIDDLEWARE = [
@@ -152,3 +153,8 @@ LOGGING = {
         }
     }
 }
+
+# Celery settings
+RABBIT_USER = os.getenv('RABBIT_USER')
+RABBIT_PASS = os.getenv('RABBIT_PASS')
+CELERY_BROKER_URL = f'amqp://{RABBIT_USER}:{RABBIT_PASS}@rabbitmq:5672//'

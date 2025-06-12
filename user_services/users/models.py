@@ -12,3 +12,6 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=12, unique=True,
                              validators=[phone_regex],
                              )
+    telegram_id = models.IntegerField(null=True, blank=True)
+
+    REQUIRED_FIELDS = ["email", "phone"]

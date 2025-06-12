@@ -15,7 +15,7 @@ dependencies = [
     "celery[rabbitmq] (>=5.5.3,<6.0.0)",
     "python-dotenv (>=1.1.0,<2.0.0)",
     "model-bakery (>=1.20.5,<2.0.0)",
-    "pytelegrambotapi (>=4.27.0,<5.0.0)",
+    "pytelegrambotapi (>=4.27.0,<5.0.0)"
 ]
 
 

@@ -4,7 +4,7 @@ services:
     container_name: "web_app"
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./user_services:/application
+      - ./user_services:/application/user_services
     ports:
       - "8000:8000"
     depends_on:
@@ -33,7 +33,7 @@ services:
     entrypoint: celery
     command: -A core.celery_app.app worker --loglevel=INFO
     volumes:
-      - ./user_services:/application
+      - ./user_services:/application/user_services
     depends_on:
       - database
       - rabbitmq
@@ -44,7 +44,7 @@ services:
 
   rabbitmq:
     container_name: rabbitmq
-    image: rabbitmq
+    image: rabbitmq:3-management
     ports:
      - "5672:5672"
      - "15672:15672"

@@ -13,6 +13,7 @@ class SubscriptionMiddleware:
     def __call__(self, request):
         if request.path == "/api/v1/orders/":
             try:
+                self.__is_authenticated(request.user)
                 subscription = self.__check_has_subscription(request.user)
                 self.__is_active(subscription)
             except PermissionDenied as err:
@@ -32,4 +33,7 @@ class SubscriptionMiddleware:
     def __is_active(self, subscription):
         if subscription.end_date < timezone.now():
             raise PermissionDenied("Your subscription has expired")
-        
+    
+    def __is_authenticated(self, user):
+        if not user.is_authenticated:
+            raise PermissionDenied("Authentication required")

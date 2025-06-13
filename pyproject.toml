@@ -20,13 +20,12 @@ model-bakery = ">=1.20.5,<2.0.0"
 requests = "^2.32.4"
 
 # Группа для бота
+
 [tool.poetry.group.bot.dependencies]
-requests = "^2.32.4"
-psycopg2-binary = "^2.9.10"
+aiogram = "^3.20.0.post0"
+asyncpg = "^0.30.0"
 python = ">=3.11"
-pytelegrambotapi = ">=4.27.0,<5.0.0"
 sqlalchemy = ">=2.0.41,<3.0.0"
-python-dotenv = ">=1.1.0,<2.0.0"
 
 
 [build-system]

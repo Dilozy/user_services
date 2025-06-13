@@ -92,6 +92,7 @@ class OrderSerializer(serializers.ModelSerializer):
     
     def save(self, **kwargs):
         user_chat_id = self.context["request"].user.telegram_chat_id
-        send_new_order_notification.delay(user_chat_id)
+        if user_chat_id:
+            send_new_order_notification.delay(user_chat_id)
         return super().save(**kwargs)
     

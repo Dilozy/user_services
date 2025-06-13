@@ -11,7 +11,6 @@ RUN poetry config virtualenvs.create false && \
 
 COPY /user_services /application
 
-
 RUN adduser --disabled-password app-admin
 
 USER app-admin

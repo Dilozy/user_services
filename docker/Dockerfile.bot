@@ -1,0 +1,18 @@
+FROM python:3.12.11-alpine3.22
+
+WORKDIR /bot
+
+RUN pip install poetry
+
+COPY poetry.lock pyproject.toml /bot/
+
+RUN poetry config virtualenvs.create false && \
+    poetry install --no-interaction --no-ansi --no-root --only bot
+
+COPY /bot /bot
+
+RUN adduser --disabled-password bot-admin
+
+USER bot-admin
+
+EXPOSE 8001

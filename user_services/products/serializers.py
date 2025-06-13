@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import Order, Product, OrderItem
 from .services import create_order_items
+from .tasks import send_new_order_notification
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -88,4 +89,9 @@ class OrderSerializer(serializers.ModelSerializer):
         tariff_discount = user.subscription.tariff.discount_percent
 
         return total - total * tariff_discount / 100
+    
+    def save(self, **kwargs):
+        user_chat_id = self.context["request"].user.telegram_chat_id
+        send_new_order_notification.delay(user_chat_id)
+        return super().save(**kwargs)
     

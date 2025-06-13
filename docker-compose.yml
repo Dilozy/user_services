@@ -1,10 +1,12 @@
 services:
   web-app:
-    build: .
-    container_name: "web_app"
-    command: python /application/user_services/manage.py runserver 0.0.0.0:8000
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    container_name: web_app
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./user_services:/application/user_services
+      - ./user_services:/application
     ports:
       - "8000:8000"
     depends_on:
@@ -14,7 +16,7 @@ services:
 
   database:
     image: postgres:16.9-alpine3.22
-    container_name: "database_container"
+    container_name: database_container
     hostname: "database"
     environment:
       POSTGRES_USER: $DB_USER
@@ -28,12 +30,14 @@ services:
       - .env
 
   worker:
-    build: .
-    container_name: "celery_worker"
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    container_name: celery_worker
     entrypoint: celery
     command: -A core worker --loglevel=INFO
     volumes:
-      - ./user_services:/application/user_services
+      - ./user_services:/application
     depends_on:
       - database
       - rabbitmq
@@ -41,8 +45,7 @@ services:
       - .env
     links:
       - rabbitmq
-    environment:
-      - PYTHONPATH=/application/user_services
+
 
   rabbitmq:
     container_name: rabbitmq
@@ -57,6 +60,28 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     env_file:
       - .env
+
+  bot:
+    container_name: bot_container
+    command: python main.py
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.bot
+    ports:
+      - "8001:8001"
+    depends_on:
+      - database
+    env_file:
+      - .env
+    volumes:
+      - ./bot:/bot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
 
 volumes:
   postgres_data:

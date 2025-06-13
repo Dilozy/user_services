@@ -18,3 +18,4 @@ class OrderViewSet(viewsets.ModelViewSet):
         return Order.objects.all().prefetch_related("items__product") \
                                   .filter(user=self.request.user) \
                                   .defer("user")
+

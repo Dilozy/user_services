@@ -23,7 +23,9 @@ class OrderSerializer(serializers.ModelSerializer):
     products_count = serializers.IntegerField(label="Количество продуктов",
                                               write_only=True)
     items = ItemsSerializer(read_only=True, many=True)
-    total_cost = serializers.SerializerMethodField()
+    total_price = serializers.DecimalField(max_digits=10,
+                                           decimal_places=2,
+                                           read_only=True)
     to_add_amount = serializers.IntegerField(required=False,
                                       write_only=True,
                                       label="Добавить (кол-во)")
@@ -89,9 +91,3 @@ class OrderSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
-    def get_total_cost(self, obj):
-        user = self.context["request"].user
-        total = sum(item.cost for item in obj.items.all())
-        tariff_discount = user.subscription.tariff.discount_percent
-
-        return total - total * tariff_discount / 100

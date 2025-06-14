@@ -11,7 +11,7 @@ class SubscriptionMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path == "/api/v1/orders/":
+        if request.path.startswith("/api/v1/orders/"):
             try:
                 self.__is_authenticated(request.user)
                 subscription = self.__get_subscription_from(request.user)

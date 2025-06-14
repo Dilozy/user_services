@@ -38,7 +38,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                                    "user__first_name", "user__last_name",
                                    "user__is_superuser", "user__username", "user__email",
                                    "user__is_staff", "user__is_active", "user__date_joined",
-                                   "user__phone", "user__telegram_chat_id",
+                                   "user__phone",
                                    "user__subscription__start_date",
                                    "user__subscription__end_date",
                                    "user__subscription__tariff__name",

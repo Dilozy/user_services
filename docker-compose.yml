@@ -83,6 +83,18 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
 
+  redis:
+    container_name: redis_container
+    image: redis:8.0.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server
+
 volumes:
   postgres_data:
   rabbitmq_data:
+  redis_data:
+

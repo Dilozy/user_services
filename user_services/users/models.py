@@ -12,6 +12,7 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=12, unique=True,
                              validators=[phone_regex],
                              )
+    # заполняется сервисом bot при регистрации
     telegram_chat_id = models.IntegerField(null=True, blank=True)
 
     REQUIRED_FIELDS = ["email", "phone"]

@@ -14,7 +14,7 @@ class SubscriptionMiddleware:
         if request.path == "/api/v1/orders/":
             try:
                 self.__is_authenticated(request.user)
-                subscription = self.__check_has_subscription(request.user)
+                subscription = self.__get_subscription_from(request.user)
                 self.__is_active(subscription)
             except PermissionDenied as err:
                 return JsonResponse(
@@ -24,7 +24,7 @@ class SubscriptionMiddleware:
             
         return self.get_response(request)
 
-    def __check_has_subscription(self, user):
+    def __get_subscription_from(self, user):
         try: 
             return UserSubscription.objects.get(user=user)
         except UserSubscription.DoesNotExist:

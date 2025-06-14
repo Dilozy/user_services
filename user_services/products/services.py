@@ -1,7 +1,7 @@
-from .models import Order, Product, OrderItem
+from .models import Product, OrderItem
 
 
-def create_order_items(products_count, order):
+def create_or_update_existing_order_items(products_count, order):
     products = Product.objects.order_by("?")[:products_count]
     create_items = []
     update_items = []

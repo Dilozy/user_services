@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import Order, Product, OrderItem
-from .services import create_order_items
+from .services import create_or_update_existing_order_items
 from .tasks import send_new_order_notification
 
 
@@ -69,14 +69,17 @@ class OrderSerializer(serializers.ModelSerializer):
 
         new_order = Order.objects.create(**validated_data,
                                          user=user)
-        create_order_items(products_count, new_order)
+        create_or_update_existing_order_items(products_count,
+                                              new_order)
         
         return new_order
     
     def update(self, instance, validated_data):
         if "to_add_amount" in validated_data:
-            create_order_items(validated_data["to_add_amount"],
-                               instance)
+            create_or_update_existing_order_items(
+                validated_data["to_add_amount"],
+                instance
+                )
         
         if "to_remove_id" in validated_data:
             validated_data["to_remove_obj"].delete()

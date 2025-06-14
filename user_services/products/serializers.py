@@ -72,6 +72,9 @@ class OrderSerializer(serializers.ModelSerializer):
         create_or_update_existing_order_items(products_count,
                                               new_order)
         
+        if user.telegram_chat_id:
+            send_new_order_notification.delay(user.telegram_chat_id)
+        
         return new_order
     
     def update(self, instance, validated_data):
@@ -92,10 +95,3 @@ class OrderSerializer(serializers.ModelSerializer):
         tariff_discount = user.subscription.tariff.discount_percent
 
         return total - total * tariff_discount / 100
-    
-    def save(self, **kwargs):
-        user_chat_id = self.context["request"].user.telegram_chat_id
-        if user_chat_id:
-            send_new_order_notification.delay(user_chat_id)
-        return super().save(**kwargs)
-    

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.db.models import Count
 
 from .models import Order, Product, OrderItem
-from .services import create_or_update_existing_order_items
+from .services import create_order_items, update_order_items
 from .tasks import send_new_order_notification
 
 
@@ -36,11 +36,11 @@ class ListRetrieveDeleteOrderSerializer(OrderSerializer):
 
 class UpdateOrderSerializer(OrderSerializer):
     to_add_amount = serializers.IntegerField(required=False,
-                                      write_only=True,
-                                      label="Добавить (кол-во)")
+                                             write_only=True,
+                                             label="Добавить (кол-во)")
     to_remove_id = serializers.IntegerField(required=False,
-                                         write_only=True,
-                                         label="Удалить (id продукта)")
+                                            write_only=True,
+                                            label="Удалить (id продукта)")
     items = ItemsSerializer(read_only=True, many=True, source="prefetched_items")
     total_price = serializers.DecimalField(max_digits=10,
                                            decimal_places=2,
@@ -50,14 +50,13 @@ class UpdateOrderSerializer(OrderSerializer):
         if "to_remove_id" in data:
             target_item = self.__validate_to_remove_id(data["to_remove_id"])
             data["target_item"] = target_item
-        
         if "to_add_amount" in data:
             self.__validate_to_add_amount(data["to_add_amount"])
         
         return data
     
     def __validate_to_add_amount(self, value):
-        total_products_in_db = Product.objects.all().aggregate(count=Count("id"))["count"]
+        total_products_in_db = Product.objects.count()
             
         if value > total_products_in_db:
             raise serializers.ValidationError(
@@ -85,14 +84,14 @@ class UpdateOrderSerializer(OrderSerializer):
     
     def update(self, instance, validated_data):
         if "to_add_amount" in validated_data:
-            create_or_update_existing_order_items(
+            update_order_items(
                 validated_data["to_add_amount"],
                 instance
                 )
         
         if "to_remove_id" in validated_data:
             validated_data["target_item"].delete()
-
+            
         return super().update(instance, validated_data)
 
 
@@ -116,8 +115,8 @@ class CreateOrderSerializer(OrderSerializer):
 
         new_order = Order.objects.create(**validated_data,
                                          user=user)
-        create_or_update_existing_order_items(products_count,
-                                              new_order)
+        create_order_items(products_count,
+                           new_order)
         
         if user.telegram_chat_id:
             send_new_order_notification.delay(user.telegram_chat_id)

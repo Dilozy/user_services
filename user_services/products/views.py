@@ -2,6 +2,8 @@ from decimal import Decimal
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 from django.db.models import Prefetch, F, Sum, ExpressionWrapper, DecimalField
 
 from .models import Order, OrderItem
@@ -42,9 +44,19 @@ class OrderViewSet(viewsets.ModelViewSet):
                             .prefetch_related(
                                 Prefetch(
                                     "items",
-                                    queryset=OrderItem.objects.select_related("product")
+                                    queryset=OrderItem.objects.select_related("product"),
+                                    to_attr="prefetched_items"
                                     )
                                 ) \
                             .filter(user=self.request.user) \
                             .annotate(total_price=discount_price) \
                             .defer(*unused_fields)
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        
+        response_msg = {"details": "Ваш заказ успшено создан!"}      
+        return Response(response_msg, status=status.HTTP_201_CREATED, headers=headers)

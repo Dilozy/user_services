@@ -5,11 +5,15 @@ from .models import Product, OrderItem
 
 def create_or_update_existing_order_items(products_count, order):
     products = Product.objects.order_by("?")[:products_count]
+    order_items = {
+        order_item.product: order_item for order_item in OrderItem.objects.filter(order=order)
+        }
     create_items = []
     update_items = []
     
     for product in products:
-        if (order_item := OrderItem.objects.filter(product=product, order=order).first()):
+        if product in order_items:
+            order_item = order_items[product]
             order_item.quantity += 1
             update_items.append(order_item)
         else:

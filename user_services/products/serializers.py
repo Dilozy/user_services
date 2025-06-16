@@ -22,7 +22,7 @@ class ItemsSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     products_count = serializers.IntegerField(label="Количество продуктов",
                                               write_only=True)
-    items = ItemsSerializer(read_only=True, many=True)
+    items = ItemsSerializer(read_only=True, many=True, source="prefetched_items")
     total_price = serializers.DecimalField(max_digits=10,
                                            decimal_places=2,
                                            read_only=True)

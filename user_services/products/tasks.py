@@ -1,12 +1,14 @@
 import os
 
-import requests
 from celery import shared_task
+from asgiref.sync import async_to_sync
+import aiogram
 
 
 @shared_task
 def send_new_order_notification(chat_id, message="Вам пришёл новый заказ!"):
-    token = os.getenv("BOT_TOKEN")
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    async def _async_send_new_order_notification():
+        bot = aiogram.Bot(os.getenv("BOT_TOKEN"))
+        await bot.send_message(chat_id, message)
     
-    requests.post(url, data={"chat_id": chat_id, "text": message}, timeout=7)
+    return async_to_sync(_async_send_new_order_notification)()

@@ -52,11 +52,17 @@ class OrderViewSet(viewsets.ModelViewSet):
                             .annotate(total_price=discount_price) \
                             .defer(*unused_fields)
     
+    def update(self, request, *args, **kwargs):
+        super().update(request, *args, **kwargs)
+        
+        response_msg = {"details": "Ваш заказ успешно обновлен!"}
+        return Response(response_msg)
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         
-        response_msg = {"details": "Ваш заказ успшено создан!"}      
+        response_msg = {"details": "Ваш заказ успешно создан!"}      
         return Response(response_msg, status=status.HTTP_201_CREATED, headers=headers)

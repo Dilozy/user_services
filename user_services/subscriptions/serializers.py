@@ -11,24 +11,20 @@ class ListDetailTariffsSerializer(serializers.ModelSerializer):
 
 
 class UserSubscriptionSerializer(serializers.ModelSerializer):
-    tariff = serializers.CharField(write_only=True, label="Тариф", required=False)
+    tariff = serializers.CharField(write_only=True, label="Тариф")
     tariff_details = ListDetailTariffsSerializer(read_only=True, source="tariff")
     user = UserSerializer(read_only=True)
 
     class Meta:
         model = UserSubscription
         fields = "__all__"
-        read_only_fields = ["end_date", "start_date"]
-    
+        read_only_fields = ["end_date", "start_date", "end_date"]
+
     def validate(self, data):
-        if "tariff" in data:
-            try:
-                data["tariff"] = Tariff.objects.get(name=data["tariff"])
-            except Tariff.DoesNotExist:
-                raise serializers.ValidationError({"error": "Тариф не найден"})
-        
-        elif self.context["request"].method == "POST" and "tariff" not in data:
-            raise serializers.ValidationError({"error": "В запросе необходимо указать тариф"})
+        try:
+            data["tariff"] = Tariff.objects.get(name=data["tariff"])
+        except Tariff.DoesNotExist:
+            raise serializers.ValidationError({"error": "Тариф не найден"})
         
         return data
     

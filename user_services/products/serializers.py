@@ -41,9 +41,9 @@ class OrderSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        request = self.context["request"]
+        request_method = self.context["request"].method
         
-        if request.method in ["PUT", "PATCH"]:
+        if request_method in ["PUT", "PATCH"]:
             self.fields.pop("products_count")
         else:
             self.fields.pop("to_add_amount")
@@ -51,17 +51,23 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if "to_remove_id" in data:
-            try:
-                order_item = OrderItem.objects.get(
-                    product__id=data["to_remove_id"],
-                    order=Order.objects.get(id=self.context["order_id"])
-                    )
-            except OrderItem.DoesNotExist:
+            order_id = self.context["order_id"]
+
+            order_items = OrderItem.objects.filter(order__id=order_id)
+            target_item = order_items.filter(product__id=data["to_remove_id"]) \
+                                     .first()
+            
+            if not target_item:
                 raise serializers.ValidationError(
                     {"error": "Продукта с таким id нет в заказе"}
-                    )
+                )
             
-            data["to_remove_obj"] = order_item
+            if order_items.count() == 1:
+                raise serializers.ValidationError({
+                    "error": "Невозможно удалить последний товар из заказа. "
+                    "Воспользуйтесь методом DELETE для удаления"})
+            
+            data["to_remove_obj"] = target_item  # Хорошо ли так делать?
         
         return data
 
@@ -90,4 +96,3 @@ class OrderSerializer(serializers.ModelSerializer):
             validated_data["to_remove_obj"].delete()
 
         return super().update(instance, validated_data)
-

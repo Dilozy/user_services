@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.conf import settings
@@ -33,12 +31,3 @@ class UserSubscription(models.Model):
                                related_name="subscriptions")
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-
-    def save(self, *args, **kwargs):
-        if "duration_in_days" in kwargs:
-            duration_in_days = kwargs.pop("duration_in_days")
-            
-            self.start_date = datetime.now()
-            self.end_date = self.start_date + timedelta(days=duration_in_days)
-        
-        super().save(*args, **kwargs)

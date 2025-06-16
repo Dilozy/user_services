@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django.utils import timezone
 from rest_framework import serializers
 
 from .models import Tariff, UserSubscription
@@ -18,7 +21,7 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSubscription
         fields = "__all__"
-        read_only_fields = ["end_date", "start_date", "end_date"]
+        read_only_fields = ["end_date", "start_date"]
 
     def validate(self, data):
         try:
@@ -32,7 +35,11 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
         tariff = validated_data["tariff"]
         user = self.context["request"].user
         
-        new_subscription = UserSubscription(**validated_data,
-                                            user=user)
-        new_subscription.save(duration_in_days=tariff.duration_in_days)
-        return new_subscription
+        start_date = timezone.now()
+        end_date = start_date + timedelta(days=tariff.duration_in_days)
+        
+        return UserSubscription.objects.create(**validated_data,
+                                               user=user,
+                                               start_date=start_date,
+                                               end_date=end_date)
+

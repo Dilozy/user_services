@@ -7,12 +7,15 @@ from rest_framework import status
 from django.db.models import Prefetch, F, Sum, ExpressionWrapper, DecimalField
 
 from .models import Order, OrderItem
-from .serializers import OrderSerializer
+from .serializers import OrderSerializerClassFactory
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        class_factory = OrderSerializerClassFactory(self.request.method)
+        return class_factory.get_serializer_class()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
